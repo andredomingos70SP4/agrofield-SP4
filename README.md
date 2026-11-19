@@ -1,1 +1,2388 @@
-# agrofield-SP4
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#064e3b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>AgroField Pro | Caderno de Campo & Scouting Georreferenciado</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Scrollbars discretas */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Impressão Oficial / PDF */
+        @media print {
+            body { background: white !important; color: #0f172a !important; font-size: 10.5pt; }
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            main { padding: 0 !important; margin: 0 !important; max-width: 100% !important; }
+            .shadow-sm, .shadow-md, .shadow-lg { box-shadow: none !important; border: 1px solid #cbd5e1 !important; }
+            .print-break-avoid { break-inside: avoid; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid #94a3b8 !important; padding: 6px 8px !important; font-size: 9pt !important; }
+            thead { background-color: #f1f5f9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans antialiased min-h-screen flex flex-col md:flex-row pb-24 md:pb-0">
+
+    <!-- ========================================== -->
+    <!-- BARRA LATERAL DESKTOP (SIDEBAR)            -->
+    <!-- ========================================== -->
+    <aside class="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 bg-emerald-950 text-white z-30 no-print">
+        <!-- Logótipo -->
+        <div class="flex items-center gap-3 px-5 py-5 border-b border-emerald-900/80">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-400 shrink-0">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <div>
+                <span class="font-extrabold text-lg tracking-tight block leading-none">AgroField Pro</span>
+                <span class="text-[11px] text-emerald-400 font-medium tracking-wider uppercase mt-1 block">Caderno & Scouting</span>
+            </div>
+        </div>
+
+        <!-- Navegação Principal Desktop -->
+        <nav class="flex-1 px-3 py-5 space-y-1.5 overflow-y-auto">
+            <button onclick="switchView('dashboard')" id="nav-desk-dashboard" class="nav-desk-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold transition bg-emerald-800 text-white">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                <span>Painel Geral</span>
+            </button>
+
+            <button onclick="switchView('scouting')" id="nav-desk-scouting" class="nav-desk-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold transition text-emerald-200 hover:bg-emerald-900/60 hover:text-white">
+                <div class="flex items-center gap-3">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <span>Scouting & Fotos</span>
+                </div>
+                <span id="badge-open-scouting-desk" class="hidden px-2 py-0.5 text-[11px] font-extrabold rounded-full bg-amber-500 text-emerald-950">0</span>
+            </button>
+
+            <button onclick="switchView('new-record')" id="nav-desk-new-record" class="nav-desk-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold transition text-emerald-200 hover:bg-emerald-900/60 hover:text-white">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>Registar Operação</span>
+            </button>
+
+            <button onclick="switchView('history')" id="nav-desk-history" class="nav-desk-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold transition text-emerald-200 hover:bg-emerald-900/60 hover:text-white">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+                <span>Histórico Caderno</span>
+            </button>
+
+            <button onclick="switchView('parcels')" id="nav-desk-parcels" class="nav-desk-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold transition text-emerald-200 hover:bg-emerald-900/60 hover:text-white">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                <span>Setores & Parcelas</span>
+            </button>
+        </nav>
+
+        <!-- Ações Rápidas de Dados na Sidebar -->
+        <div class="p-4 border-t border-emerald-900/80 space-y-2">
+            <p class="text-[11px] font-bold uppercase tracking-wider text-emerald-400">Ferramentas & Dados</p>
+            <div class="grid grid-cols-2 gap-1.5">
+                <button onclick="exportCSV()" class="px-2.5 py-2 rounded-lg bg-emerald-900 hover:bg-emerald-800 text-emerald-100 text-xs font-semibold transition text-center">
+                    Exportar CSV
+                </button>
+                <button onclick="printCaderno()" class="px-2.5 py-2 rounded-lg bg-emerald-900 hover:bg-emerald-800 text-emerald-100 text-xs font-semibold transition text-center">
+                    Imprimir PDF
+                </button>
+            </div>
+            <div class="grid grid-cols-2 gap-1.5">
+                <button onclick="exportBackupJSON()" class="px-2.5 py-2 rounded-lg bg-emerald-900/60 hover:bg-emerald-800 text-emerald-200 text-xs font-medium transition text-center">
+                    Backup JSON
+                </button>
+                <label class="px-2.5 py-2 rounded-lg bg-emerald-900/60 hover:bg-emerald-800 text-emerald-200 text-xs font-medium transition text-center cursor-pointer">
+                    <span>Restaurar</span>
+                    <input type="file" accept=".json" onchange="importBackupJSON(event)" class="hidden">
+                </label>
+            </div>
+            <div class="pt-1 flex items-center justify-between text-[11px] text-emerald-400/80">
+                <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> Offline pronto</span>
+                <span id="storage-usage-label">0 KB</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ========================================== -->
+    <!-- CABEÇALHO MOBILE SUPERIOR                  -->
+    <!-- ========================================== -->
+    <header class="md:hidden bg-emerald-950 text-white px-4 py-3 sticky top-0 z-30 flex items-center justify-between shadow-md no-print">
+        <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <div>
+                <h1 class="font-bold text-base leading-none">AgroField Pro</h1>
+                <span class="text-[10px] text-emerald-300 font-medium" id="mobile-header-subtitle">Caderno de Campo & Scouting</span>
+            </div>
+        </div>
+        <div class="flex items-center gap-1.5">
+            <button onclick="openNewScoutingModal()" class="bg-amber-400 hover:bg-amber-300 text-emerald-950 font-bold text-xs px-2.5 py-2 rounded-xl flex items-center gap-1 shadow-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                <span>Foto</span>
+            </button>
+            <button onclick="switchView('new-record')" class="bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-bold text-xs px-2.5 py-2 rounded-xl flex items-center gap-1 shadow-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                <span>Registar</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- ========================================== -->
+    <!-- BARRA DE NAVEGAÇÃO INFERIOR MOBILE         -->
+    <!-- ========================================== -->
+    <nav class="md:hidden fixed bottom-0 inset-x-0 bg-white border-t border-slate-200 z-30 flex justify-around items-center py-1.5 px-1 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.06)] no-print">
+        <button onclick="switchView('dashboard')" id="nav-mob-dashboard" class="nav-mob-btn flex flex-col items-center justify-center p-1.5 rounded-xl text-emerald-700 font-bold w-1/5">
+            <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            <span class="text-[10px]">Painel</span>
+        </button>
+
+        <button onclick="switchView('scouting')" id="nav-mob-scouting" class="nav-mob-btn relative flex flex-col items-center justify-center p-1.5 rounded-xl text-slate-500 font-medium w-1/5">
+            <span id="badge-open-scouting-mob" class="hidden absolute top-1 right-2 w-2 h-2 rounded-full bg-amber-500"></span>
+            <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <span class="text-[10px]">Scouting</span>
+        </button>
+
+        <button onclick="switchView('new-record')" id="nav-mob-new-record" class="nav-mob-btn flex flex-col items-center justify-center p-1.5 rounded-xl text-slate-500 font-medium w-1/5">
+            <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span class="text-[10px]">Operação</span>
+        </button>
+
+        <button onclick="switchView('history')" id="nav-mob-history" class="nav-mob-btn flex flex-col items-center justify-center p-1.5 rounded-xl text-slate-500 font-medium w-1/5">
+            <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            <span class="text-[10px]">Caderno</span>
+        </button>
+
+        <button onclick="switchView('parcels')" id="nav-mob-parcels" class="nav-mob-btn flex flex-col items-center justify-center p-1.5 rounded-xl text-slate-500 font-medium w-1/5">
+            <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+            <span class="text-[10px]">Setores</span>
+        </button>
+    </nav>
+
+    <!-- ========================================== -->
+    <!-- CONTEÚDO PRINCIPAL                         -->
+    <!-- ========================================== -->
+    <main class="flex-1 md:pl-64">
+        <div class="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+
+            <!-- Barra Superior Desktop de Ações Rápidas -->
+            <div class="hidden md:flex items-center justify-between bg-white px-5 py-3 rounded-2xl border border-slate-200 shadow-sm no-print">
+                <div>
+                    <h1 class="text-lg font-extrabold text-slate-900 leading-tight">AgroField Pro</h1>
+                    <p class="text-xs text-slate-500 font-medium">Caderno de Campo & Scouting Georreferenciado</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button id="btn-clear-demo-top" onclick="openClearDemoModal()" class="hidden px-3 py-2 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-bold transition">
+                        Limpar Dados Exemplo
+                    </button>
+                    <button onclick="exportBackupJSON()" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition">
+                        Backup JSON
+                    </button>
+                    <label class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition cursor-pointer">
+                        <span>Restaurar JSON</span>
+                        <input type="file" accept=".json" onchange="importBackupJSON(event)" class="hidden">
+                    </label>
+                    <button onclick="exportCSV()" class="px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold transition">
+                        Exportar CSV
+                    </button>
+                    <button onclick="printCaderno()" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition">
+                        Imprimir Relatório
+                    </button>
+                </div>
+            </div>
+
+            <!-- Cabeçalho Exclusivo para Impressão Oficial -->
+            <div class="hidden print-only border-b-2 border-slate-900 pb-4 mb-6">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h1 class="text-2xl font-extrabold uppercase tracking-tight">AgroField Pro — Relatório Oficial</h1>
+                        <p class="text-sm text-slate-700 font-medium mt-1">Caderno de Campo, Tratamentos Fitossanitários e Registo de Scouting</p>
+                    </div>
+                    <div class="text-right text-xs text-slate-600">
+                        <p class="font-bold text-slate-900" id="print-farm-name">Exploração Agrícola</p>
+                        <p id="print-date-stamp"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Banner de Modo Demonstração -->
+            <div id="demo-banner" class="hidden bg-amber-50 border border-amber-200 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 no-print">
+                <div class="flex items-start sm:items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-amber-950">Dados de Demonstração Carregados</h3>
+                        <p class="text-xs text-amber-800">Explore os setores, os intervalos de segurança e as notas de scouting com fotografia antes de limpar para os seus dados reais.</p>
+                    </div>
+                </div>
+                <button onclick="openClearDemoModal()" class="px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition shrink-0 self-start sm:self-auto">
+                    Limpar Dados Exemplo
+                </button>
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- VISTA 1: PAINEL GERAL (DASHBOARD)                         -->
+            <!-- ========================================================= -->
+            <section id="view-dashboard" class="view-section space-y-6">
+                <!-- Título e Botões Rápidos de Campo -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 no-print">
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Painel Geral</h2>
+                        <p class="text-sm text-slate-500">Visão integrada da exploração, alertas de scouting e períodos de carência.</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2.5">
+                        <button onclick="openNewScoutingModal()" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-emerald-950 text-sm font-extrabold shadow-sm transition">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            <span>Nova Nota Foto + GPS</span>
+                        </button>
+                        <button onclick="switchView('new-record')" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold shadow-sm transition">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                            <span>Registar Operação</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KPIs Principais (4 Cartões) -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- KPI 1: Setores Ativos -->
+                    <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-sm">
+                        <div class="flex items-center justify-between text-slate-500 mb-2">
+                            <span class="text-xs font-bold uppercase tracking-wider">Setores Ativos</span>
+                            <span class="p-2 rounded-lg bg-emerald-50 text-emerald-600">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                            </span>
+                        </div>
+                        <div class="text-2xl sm:text-3xl font-extrabold text-slate-900" id="kpi-total-parcels">0</div>
+                        <p class="text-xs text-slate-500 mt-1" id="kpi-parcels-breakdown">0 estufas · 0 ar livre</p>
+                    </div>
+
+                    <!-- KPI 2: Área Total -->
+                    <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-sm">
+                        <div class="flex items-center justify-between text-slate-500 mb-2">
+                            <span class="text-xs font-bold uppercase tracking-wider">Área Total</span>
+                            <span class="p-2 rounded-lg bg-sky-50 text-sky-600">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+                            </span>
+                        </div>
+                        <div class="text-2xl sm:text-3xl font-extrabold text-slate-900" id="kpi-total-ha">0,00 ha</div>
+                        <p class="text-xs text-slate-500 mt-1" id="kpi-total-m2">0 m²</p>
+                    </div>
+
+                    <!-- KPI 3: Tratamentos (30d) -->
+                    <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-sm">
+                        <div class="flex items-center justify-between text-slate-500 mb-2">
+                            <span class="text-xs font-bold uppercase tracking-wider">Tratamentos (30d)</span>
+                            <span class="p-2 rounded-lg bg-purple-50 text-purple-600">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                            </span>
+                        </div>
+                        <div class="text-2xl sm:text-3xl font-extrabold text-slate-900" id="kpi-month-treatments">0</div>
+                        <p class="text-xs text-slate-500 mt-1" id="kpi-total-records">0 registos no caderno</p>
+                    </div>
+
+                    <!-- KPI 4: Alertas de Scouting Ativos -->
+                    <div onclick="switchView('scouting')" class="cursor-pointer bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-sm hover:border-amber-400 transition" id="kpi-scouting-card">
+                        <div class="flex items-center justify-between text-slate-500 mb-2">
+                            <span class="text-xs font-bold uppercase tracking-wider">Alertas Scouting</span>
+                            <span class="p-2 rounded-lg bg-amber-100 text-amber-700">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            </span>
+                        </div>
+                        <div class="text-2xl sm:text-3xl font-extrabold text-slate-900" id="kpi-scouting-open">0</div>
+                        <p class="text-xs text-slate-500 mt-1" id="kpi-scouting-sub">0 críticos · pendentes</p>
+                    </div>
+                </div>
+
+                <!-- Semáforo de Intervalos de Segurança (IS) -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-base">Semáforo de Intervalos de Segurança (IS)</h3>
+                            <p class="text-xs text-slate-500">Contagem decrescente automática de carência fitossanitária por setor</p>
+                        </div>
+                        <button onclick="switchView('parcels')" class="text-xs font-bold text-emerald-700 hover:text-emerald-900 no-print">Gerir setores →</button>
+                    </div>
+                    <div class="p-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="dashboard-parcels-status">
+                        <!-- Injetado via JS -->
+                    </div>
+                </div>
+
+                <!-- Últimas Notas de Scouting com Foto (Mini-galeria) -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-base">Últimas Notas de Scouting no Terreno</h3>
+                            <p class="text-xs text-slate-500">Registos fotográficos georreferenciados mais recentes</p>
+                        </div>
+                        <button onclick="switchView('scouting')" class="text-xs font-bold text-emerald-700 hover:text-emerald-900 no-print">Ver todas as fotos →</button>
+                    </div>
+                    <div class="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="dashboard-scouting-preview">
+                        <!-- Injetado via JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================================= -->
+            <!-- VISTA 2: SCOUTING & FOTOS (ESTILO ONESOIL SCOUTING)       -->
+            <!-- ========================================================= -->
+            <section id="view-scouting" class="view-section hidden space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 no-print">
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Scouting & Notas Georreferenciadas</h2>
+                        <p class="text-sm text-slate-500">Capte ocorrências no terreno com fotografia, localização GPS e converta em tratamentos.</p>
+                    </div>
+                    <button onclick="openNewScoutingModal()" class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-emerald-950 text-sm font-extrabold shadow-sm transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        <span>Nova Nota de Scouting</span>
+                    </button>
+                </div>
+
+                <!-- Filtros da Galeria de Scouting -->
+                <div class="bg-white rounded-2xl border border-slate-200 p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 no-print">
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase text-slate-400 mb-1">Setor / Parcela</label>
+                        <select id="scout-filter-parcel" onchange="renderScoutingList()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            <option value="all">Todos os setores</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase text-slate-400 mb-1">Categoria</label>
+                        <select id="scout-filter-category" onchange="renderScoutingList()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            <option value="all">Todas as categorias</option>
+                            <option value="Praga">Praga</option>
+                            <option value="Doença">Doença</option>
+                            <option value="Infestante">Infestante</option>
+                            <option value="Carência Nutricional">Carência Nutricional</option>
+                            <option value="Rega/Drenagem">Rega / Drenagem</option>
+                            <option value="Auxiliares Biológicos">Auxiliares Biológicos</option>
+                            <option value="Estado Vegetativo">Estado Vegetativo</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase text-slate-400 mb-1">Severidade</label>
+                        <select id="scout-filter-severity" onchange="renderScoutingList()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            <option value="all">Todos os níveis</option>
+                            <option value="critico">Crítico (Ação Imediata)</option>
+                            <option value="medio">Médio (Atenção)</option>
+                            <option value="baixo">Baixo (Monitorizar)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase text-slate-400 mb-1">Estado</label>
+                        <select id="scout-filter-status" onchange="renderScoutingList()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            <option value="all">Todos (Abertos e Resolvidos)</option>
+                            <option value="aberto">Apenas Abertos / Pendentes</option>
+                            <option value="resolvido">Apenas Resolvidos</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Grelha de Cartões de Scouting -->
+                <div id="scouting-cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <!-- Injetado via JS -->
+                </div>
+            </section>
+
+            <!-- ========================================================= -->
+            <!-- VISTA 3: REGISTAR OPERAÇÃO (CADERNO DE CAMPO)             -->
+            <!-- ========================================================= -->
+            <section id="view-new-record" class="view-section hidden space-y-6 no-print">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Registar Operação no Caderno</h2>
+                        <p class="text-sm text-slate-500">Escolha o tipo de intervenção para registar oficialmente.</p>
+                    </div>
+                    <span id="scouting-linked-badge" class="hidden inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-100 text-amber-900 text-xs font-bold border border-amber-300">
+                        <span>Vinculado a nota de Scouting</span>
+                        <button type="button" onclick="clearLinkedScouting()" class="ml-1 text-amber-700 hover:text-amber-950 font-extrabold">✕</button>
+                    </span>
+                </div>
+
+                <!-- 4 Sub-Abas de Tipo de Operação -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    <button type="button" onclick="selectOperationType('tratamento')" id="op-tab-tratamento" class="op-tab-btn p-4 rounded-2xl border-2 border-emerald-600 bg-emerald-50/70 text-left transition shadow-sm">
+                        <div class="w-9 h-9 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center mb-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                        </div>
+                        <div class="font-bold text-sm text-slate-900">1. Fitossanitário</div>
+                        <div class="text-[11px] text-slate-500 mt-0.5">Tratamentos e IS</div>
+                    </button>
+
+                    <button type="button" onclick="selectOperationType('fertilizacao')" id="op-tab-fertilizacao" class="op-tab-btn p-4 rounded-2xl border border-slate-200 bg-white hover:border-emerald-300 text-left transition">
+                        <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center mb-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                        </div>
+                        <div class="font-bold text-sm text-slate-900">2. Fertilização</div>
+                        <div class="text-[11px] text-slate-500 mt-0.5">Fertirrega e foliar</div>
+                    </button>
+
+                    <button type="button" onclick="selectOperationType('rega')" id="op-tab-rega" class="op-tab-btn p-4 rounded-2xl border border-slate-200 bg-white hover:border-emerald-300 text-left transition">
+                        <div class="w-9 h-9 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center mb-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                        </div>
+                        <div class="font-bold text-sm text-slate-900">3. Rega & EC/pH</div>
+                        <div class="text-[11px] text-slate-500 mt-0.5">Dotação e drenagem</div>
+                    </button>
+
+                    <button type="button" onclick="selectOperationType('biologica')" id="op-tab-biologica" class="op-tab-btn p-4 rounded-2xl border border-slate-200 bg-white hover:border-emerald-300 text-left transition">
+                        <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center mb-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                        </div>
+                        <div class="font-bold text-sm text-slate-900">4. Luta Biológica</div>
+                        <div class="text-[11px] text-slate-500 mt-0.5">Auxiliares e largadas</div>
+                    </button>
+                </div>
+
+                <!-- Formulário de Registo -->
+                <form id="record-form" onsubmit="handleRecordSubmit(event)" class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 sm:p-6 space-y-5">
+                    <input type="hidden" id="rec-type" value="tratamento">
+                    <input type="hidden" id="rec-linked-scout-id" value="">
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="rec-date" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Data da Operação *</label>
+                            <input type="date" id="rec-date" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-3 text-sm font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                        </div>
+                        <div>
+                            <label for="rec-parcel" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Setor / Parcela *</label>
+                            <select id="rec-parcel" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-3 text-sm font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                <!-- Preenchido via JS -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- SUB-ABA 1: TRATAMENTO FITOSSANITÁRIO -->
+                    <div id="fields-tratamento" class="op-fields space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="fito-product" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Produto Comercial *</label>
+                                <input type="text" id="fito-product" list="fito-products-list" placeholder="Selecione ou escreva..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-3 text-sm font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                <datalist id="fito-products-list">
+                                    <option value="Prev-Am (Óleo essencial de laranja)">
+                                    <option value="Sivanto Prime (Flupiradifurona)">
+                                    <option value="Stomp Aqua (Pendimetalina)">
+                                    <option value="Venzar 500 SC (Lenacil)">
+                                    <option value="Karate Zeon (Lambda-cialotrina)">
+                                    <option value="Enxofre WG">
+                                    <option value="Calda Bordalesa / Cobre">
+                                    <option value="Movento (Espirotetramato)">
+                                    <option value="Vertimec 018 EC (Abamectina)">
+                                    <option value="Switch (Ciprodinil + Fludioxonil)">
+                                    <option value="Signum (Boscalide + Piraclostrobina)">
+                                </datalist>
+                            </div>
+                            <div>
+                                <label for="fito-target" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Alvo / Praga / Doença *</label>
+                                <input type="text" id="fito-target" list="fito-targets-list" placeholder="Ex: Afídeos, Aranhiço, Oídio..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-3 text-sm font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                <datalist id="fito-targets-list">
+                                    <option value="Afídeos / Piolho">
+                                    <option value="Aranhiço-vermelho">
+                                    <option value="Mosca-branca">
+                                    <option value="Tripes">
+                                    <option value="Cochonilha-algodão">
+                                    <option value="Oídio">
+                                    <option value="Míldio">
+                                    <option value="Podridão cinzenta (Botrytis)">
+                                    <option value="Infestantes anuais">
+                                </datalist>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                            <div>
+                                <label for="fito-dose" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Dose *</label>
+                                <input type="number" step="any" min="0" id="fito-dose" placeholder="Ex: 0.75" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-3 text-sm font-bold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                            <div>
+                                <label for="fito-unit" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Unidade *</label>
+                                <select id="fito-unit" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-3 text-sm font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                    <option value="L/ha">L/ha</option>
+                                    <option value="mL/ha">mL/ha</option>
+                                    <option value="kg/ha">kg/ha</option>
+                                    <option value="g/ha">g/ha</option>
+                                    <option value="mL/100L">mL/100L</option>
+                                    <option value="g/100L">g/100L</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="fito-volume" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Volume Calda (L)</label>
+                                <input type="number" step="1" min="0" id="fito-volume" placeholder="Ex: 600" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-3 text-sm font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                            <div>
+                                <label for="fito-is" class="block text-xs font-bold uppercase tracking-wider text-rose-700 mb-1.5">Int. Segurança (dias)</label>
+                                <input type="number" step="1" min="0" id="fito-is" value="0" class="w-full bg-rose-50/70 border border-rose-300 rounded-xl px-3.5 py-3 text-sm font-extrabold text-rose-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-500">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="fito-operator" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Aplicador / Cartão APF</label>
+                                <input type="text" id="fito-operator" placeholder="Nome e n.º cartão de aplicador" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-3 text-sm font-medium text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                            <div>
+                                <label for="fito-weather" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Condições Meteorológicas</label>
+                                <input type="text" id="fito-weather" placeholder="Ex: Céu limpo, 20°C, vento calmo" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-3 text-sm font-medium text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SUB-ABA 2: FERTILIZAÇÃO & FERTIRREGA -->
+                    <div id="fields-fertilizacao" class="op-fields hidden space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div>
+                                <label for="fert-method" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Modo de Aplicação</label>
+                                <select id="fert-method" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-3 text-sm font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                    <option value="Fertirrega Tanque 3000L">Fertirrega Tanque 3000L</option>
+                                    <option value="Fertirrega (Outro Tanque)">Fertirrega (Outro Tanque)</option>
+                                    <option value="Foliar">Foliar</option>
+                                    <option value="Cobertura">Cobertura / Fundo</option>
+                                </select>
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label for="fert-product" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Produto / Fertilizante *</label>
+                                <input type="text" id="fert-product" list="fert-products-list" placeholder="Selecione ou escreva..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-3 text-sm font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                <datalist id="fert-products-list">
+                                    <option value="Basfoliar Kelp">
+                                    <option value="Siapton">
+                                    <option value="Nitrato de Cálcio">
+                                    <option value="MAP (Fosfato Monoamónico)">
+                                    <option value="Sulfato de Potássio">
+                                    <option value="Quelato Ferro">
+                                    <option value="Nitrato de Potássio">
+                                    <option value="Sulfato de Magnésio">
+                                </datalist>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div>
+                                <label for="fert-dose" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Dose / Quantidade *</label>
+                                <input type="number" step="any" min="0" id="fert-dose" placeholder="Ex: 5.0" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-3 text-sm font-bold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                            <div>
+                                <label for="fert-unit" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Unidade</label>
+                                <select id="fert-unit" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-3 text-sm font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                    <option value="kg">kg (Total aplicado)</option>
+                                    <option value="L">L (Total aplicado)</option>
+                                    <option value="kg/ha">kg/ha</option>
+                                    <option value="L/ha">L/ha</option>
+                                    <option value="g/L">g/L</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="fert-water" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Volume Tanque / Calda (L)</label>
+                                <input type="number" step="1" min="0" id="fert-water" placeholder="Ex: 3000" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-3 text-sm font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SUB-ABA 3: REGA & MONITORIZAÇÃO -->
+                    <div id="fields-rega" class="op-fields hidden space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div>
+                                <label for="rega-amount" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Dotação / Duração *</label>
+                                <input type="text" id="rega-amount" placeholder="Ex: 30 min ou 12 m³" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-3 text-sm font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                            <div>
+                                <label for="rega-ec" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">EC (mS/cm)</label>
+                                <input type="number" step="0.01" min="0" id="rega-ec" placeholder="Ex: 1.40" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-3 text-sm font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                            <div>
+                                <label for="rega-ph" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">pH</label>
+                                <input type="number" step="0.1" min="0" max="14" id="rega-ph" placeholder="Ex: 6.2" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-3 text-sm font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SUB-ABA 4: LUTA BIOLÓGICA -->
+                    <div id="fields-biologica" class="op-fields hidden space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="bio-organism" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Organismo Auxiliar *</label>
+                                <input type="text" id="bio-organism" list="bio-organisms-list" placeholder="Selecione ou escreva..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-3 text-sm font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                <datalist id="bio-organisms-list">
+                                    <option value="Cryptolaemus montrouzieri">
+                                    <option value="Amblyseius swirskii">
+                                    <option value="Phytoseiulus persimilis">
+                                    <option value="Orius laevigatus">
+                                    <option value="Aphidius colemani">
+                                    <option value="Chrysoperla carnea">
+                                </datalist>
+                            </div>
+                            <div>
+                                <label for="bio-qty" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Quantidade / Dose *</label>
+                                <input type="text" id="bio-qty" placeholder="Ex: 2 frascos (1000 ind.) ou 50 ind./m²" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-3 text-sm font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Observações Gerais -->
+                    <div>
+                        <label for="rec-notes" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Notas / Observações</label>
+                        <textarea id="rec-notes" rows="2" placeholder="Notas operacionais, calibração ou observações do setor..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+                    </div>
+
+                    <!-- Opção automática se vier do Scouting -->
+                    <div id="resolve-scout-checkbox-wrap" class="hidden bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-center gap-3">
+                        <input type="checkbox" id="rec-resolve-scout" checked class="w-5 h-5 rounded text-emerald-600 focus:ring-emerald-500">
+                        <label for="rec-resolve-scout" class="text-xs sm:text-sm font-semibold text-amber-950 cursor-pointer">
+                            Marcar automaticamente a ocorrência de Scouting vinculada como <strong>Resolvida</strong>
+                        </label>
+                    </div>
+
+                    <div class="pt-2 flex items-center justify-end gap-3 border-t border-slate-100">
+                        <button type="button" onclick="switchView('dashboard')" class="px-4 py-3 rounded-xl border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50 transition">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold shadow-sm transition flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                            <span>Guardar no Caderno</span>
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- ========================================================= -->
+            <!-- VISTA 4: HISTÓRICO CADERNO DE CAMPO                       -->
+            <!-- ========================================================= -->
+            <section id="view-history" class="view-section hidden space-y-5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 no-print">
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Histórico Caderno de Campo</h2>
+                        <p class="text-sm text-slate-500">Registo cronológico de todas as operações culturais e prazos de segurança.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="exportCSV()" class="px-3.5 py-2.5 rounded-xl bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 text-xs sm:text-sm font-bold transition shadow-sm">
+                            Exportar CSV
+                        </button>
+                        <button onclick="printCaderno()" class="px-3.5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-bold transition shadow-sm">
+                            Imprimir Relatório
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filtros do Histórico -->
+                <div class="bg-white rounded-2xl border border-slate-200 p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 no-print">
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase text-slate-400 mb-1">Pesquisar</label>
+                        <input type="text" id="filter-search" oninput="renderHistory()" placeholder="Produto, alvo, aplicador..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase text-slate-400 mb-1">Setor / Parcela</label>
+                        <select id="filter-parcel" onchange="renderHistory()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            <option value="all">Todos os setores</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase text-slate-400 mb-1">Tipo de Operação</label>
+                        <select id="filter-type" onchange="renderHistory()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            <option value="all">Todas as operações</option>
+                            <option value="tratamento">Tratamento Fitossanitário</option>
+                            <option value="fertilizacao">Fertilização & Fertirrega</option>
+                            <option value="rega">Rega & Monitorização</option>
+                            <option value="biologica">Luta Biológica</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase text-slate-400 mb-1">Data Inicial</label>
+                        <input type="date" id="filter-date-from" onchange="renderHistory()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                </div>
+
+                <!-- Tabela de Registos -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-xs font-bold uppercase tracking-wider text-slate-500">
+                                    <th class="py-3.5 px-4">Data</th>
+                                    <th class="py-3.5 px-4">Setor / Cultura</th>
+                                    <th class="py-3.5 px-4">Operação</th>
+                                    <th class="py-3.5 px-4">Produto / Detalhes</th>
+                                    <th class="py-3.5 px-4">Dose / Volume</th>
+                                    <th class="py-3.5 px-4">Carência (IS) / Notas</th>
+                                    <th class="py-3.5 px-4 text-right no-print">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-tbody" class="divide-y divide-slate-200 text-sm">
+                                <!-- Injetado via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================================= -->
+            <!-- VISTA 5: SETORES & PARCELAS                               -->
+            <!-- ========================================================= -->
+            <section id="view-parcels" class="view-section hidden space-y-6 no-print">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Setores & Parcelas</h2>
+                        <p class="text-sm text-slate-500">Configure estufas, túneis e parcelas ao ar livre da sua exploração.</p>
+                    </div>
+                    <button onclick="openParcelModal()" class="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold shadow-sm transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                        <span>Novo Setor / Parcela</span>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="parcels-grid">
+                    <!-- Injetado via JS -->
+                </div>
+
+                <!-- Ferramentas Mobile Backup/Export -->
+                <div class="md:hidden bg-white rounded-2xl border border-slate-200 p-5 space-y-3">
+                    <h3 class="font-bold text-slate-900 text-sm">Gestão de Ficheiros & Backup</h3>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="exportCSV()" class="py-2.5 px-3 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold">Exportar CSV</button>
+                        <button onclick="printCaderno()" class="py-2.5 px-3 rounded-xl bg-slate-900 text-white text-xs font-bold">Imprimir PDF</button>
+                        <button onclick="exportBackupJSON()" class="py-2.5 px-3 rounded-xl bg-slate-100 text-slate-800 text-xs font-bold">Backup JSON</button>
+                        <label class="py-2.5 px-3 rounded-xl bg-slate-100 text-slate-800 text-xs font-bold text-center cursor-pointer">
+                            <span>Restaurar JSON</span>
+                            <input type="file" accept=".json" onchange="importBackupJSON(event)" class="hidden">
+                        </label>
+                    </div>
+                    <button id="btn-clear-demo-mob" onclick="openClearDemoModal()" class="hidden w-full py-2.5 rounded-xl bg-amber-100 text-amber-900 text-xs font-bold">
+                        Limpar Dados Exemplo
+                    </button>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- ========================================== -->
+    <!-- MODAL: NOVA NOTA DE SCOUTING + FOTO + GPS  -->
+    <!-- ========================================== -->
+    <div id="scouting-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-xs z-50 hidden items-end sm:items-center justify-center p-0 sm:p-4 no-print overflow-y-auto">
+        <div class="bg-white rounded-t-3xl sm:rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden my-auto max-h-[92vh] flex flex-col">
+            <div class="px-5 py-4 bg-emerald-950 text-white flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-2.5">
+                    <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <h3 class="font-bold text-base">Nova Nota de Scouting</h3>
+                </div>
+                <button onclick="closeNewScoutingModal()" class="text-emerald-200 hover:text-white p-1.5 rounded-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <form onsubmit="handleScoutingSubmit(event)" class="p-5 space-y-4 overflow-y-auto flex-1">
+                
+                <!-- 1. Captura Direta de Câmara ou Galeria -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Fotografia no Terreno</label>
+                    
+                    <div id="photo-capture-area" class="relative">
+                        <label for="scout-photo-input" class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-emerald-400 bg-emerald-50/50 hover:bg-emerald-50 rounded-2xl cursor-pointer transition p-4 text-center">
+                            <div class="w-11 h-11 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mb-2">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            </div>
+                            <span class="text-sm font-bold text-emerald-900">Tirar Foto ou Escolher da Galeria</span>
+                            <span class="text-[11px] text-emerald-700 mt-0.5">Compressão automática otimizada para offline</span>
+                        </label>
+                        <input type="file" id="scout-photo-input" accept="image/*" capture="environment" onchange="handlePhotoSelected(event)" class="hidden">
+                    </div>
+
+                    <!-- Pré-visualização da Foto Comprimida -->
+                    <div id="photo-preview-wrap" class="hidden relative rounded-2xl overflow-hidden border border-slate-300 bg-slate-900">
+                        <img id="scout-photo-preview" src="" alt="Pré-visualização" class="w-full h-48 object-cover">
+                        <div class="absolute bottom-2 left-2 bg-black/70 text-white text-[10px] font-semibold px-2.5 py-1 rounded-lg backdrop-blur-xs" id="photo-size-badge">
+                            Otimizada
+                        </div>
+                        <button type="button" onclick="clearSelectedPhoto()" class="absolute top-2 right-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-2.5 py-1.5 rounded-xl shadow">
+                            Remover Foto
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2. Georreferenciação GPS Automática -->
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 space-y-2.5">
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            <span>Localização GPS</span>
+                        </span>
+                        <button type="button" onclick="fetchGPSCoordinates()" id="btn-get-gps" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span>Obter Coordenadas GPS</span>
+                        </button>
+                    </div>
+
+                    <div id="gps-status-box" class="text-xs text-slate-500">
+                        Toque em "Obter Coordenadas GPS" para gravar o pin exato no mapa.
+                    </div>
+
+                    <input type="hidden" id="scout-lat" value="">
+                    <input type="hidden" id="scout-lng" value="">
+                    <input type="hidden" id="scout-acc" value="">
+
+                    <div>
+                        <input type="text" id="scout-zone-note" placeholder="Referência manual (ex: Linha 4, junto à porta norte)" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                </div>
+
+                <!-- 3. Classificação da Ocorrência -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label for="scout-parcel" class="block text-xs font-bold uppercase text-slate-600 mb-1">Setor / Parcela *</label>
+                        <select id="scout-parcel" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            <!-- Preenchido via JS -->
+                        </select>
+                    </div>
+                    <div>
+                        <label for="scout-category" class="block text-xs font-bold uppercase text-slate-600 mb-1">Categoria *</label>
+                        <select id="scout-category" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            <option value="Praga">Praga</option>
+                            <option value="Doença">Doença</option>
+                            <option value="Infestante">Infestante</option>
+                            <option value="Carência Nutricional">Carência Nutricional</option>
+                            <option value="Rega/Drenagem">Rega / Drenagem</option>
+                            <option value="Auxiliares Biológicos">Auxiliares Biológicos</option>
+                            <option value="Estado Vegetativo">Estado Vegetativo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Severidade e Estado -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Nível de Severidade *</label>
+                        <div class="grid grid-cols-3 gap-1.5">
+                            <label class="cursor-pointer">
+                                <input type="radio" name="scout-severity" value="baixo" class="peer sr-only">
+                                <div class="py-2 px-1 rounded-xl border border-slate-300 peer-checked:border-emerald-600 peer-checked:bg-emerald-50 peer-checked:text-emerald-900 text-center text-[11px] font-bold transition">
+                                    Baixo
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="scout-severity" value="medio" checked class="peer sr-only">
+                                <div class="py-2 px-1 rounded-xl border border-slate-300 peer-checked:border-amber-500 peer-checked:bg-amber-50 peer-checked:text-amber-900 text-center text-[11px] font-bold transition">
+                                    Médio
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="scout-severity" value="critico" class="peer sr-only">
+                                <div class="py-2 px-1 rounded-xl border border-slate-300 peer-checked:border-rose-600 peer-checked:bg-rose-50 peer-checked:text-rose-900 text-center text-[11px] font-bold transition">
+                                    Crítico
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="scout-status" class="block text-xs font-bold uppercase text-slate-600 mb-1">Estado</label>
+                        <select id="scout-status" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            <option value="aberto">Aberto (Acompanhamento / Tratar)</option>
+                            <option value="resolvido">Resolvido / Informativo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="scout-title" class="block text-xs font-bold uppercase text-slate-600 mb-1">Identificação / Alvo Observado *</label>
+                    <input type="text" id="scout-title" required placeholder="Ex: Foco inicial de afídeos nos rebentos, Falha gotejador..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+
+                <div>
+                    <label for="scout-notes" class="block text-xs font-bold uppercase text-slate-600 mb-1">Observações Detalhadas</label>
+                    <textarea id="scout-notes" rows="2" placeholder="Descreva a intensidade do foco, percentagem de plantas afetadas ou ação recomendada..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm font-medium text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+                </div>
+
+                <div class="pt-3 flex justify-end gap-2 border-t border-slate-100">
+                    <button type="button" onclick="closeNewScoutingModal()" class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 text-xs font-bold hover:bg-slate-50">Cancelar</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm">Guardar Nota de Scouting</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL: VISUALIZADOR LIGHTBOX FOTO SCOUTING -->
+    <!-- ========================================== -->
+    <div id="lightbox-modal" class="fixed inset-0 bg-slate-950/90 z-50 hidden items-center justify-center p-4 no-print" onclick="closeLightbox(event)">
+        <div class="max-w-3xl w-full bg-slate-900 rounded-2xl overflow-hidden border border-slate-700 shadow-2xl" onclick="event.stopPropagation()">
+            <div class="px-4 py-3 bg-slate-950 flex items-center justify-between text-white border-b border-slate-800">
+                <div class="min-w-0">
+                    <h4 class="font-bold text-sm truncate" id="lb-title">Fotografia de Campo</h4>
+                    <p class="text-xs text-slate-400 truncate" id="lb-subtitle"></p>
+                </div>
+                <button onclick="closeLightbox()" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="bg-black flex items-center justify-center max-h-[65vh] overflow-hidden">
+                <img id="lb-image" src="" alt="Scouting Fullscreen" class="max-h-[65vh] w-auto object-contain">
+            </div>
+            <div class="p-4 bg-slate-900 text-slate-200 text-xs space-y-2">
+                <p id="lb-notes" class="text-sm text-white"></p>
+                <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-800" id="lb-footer">
+                    <!-- Coordenadas e link Google Maps injetados -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL: CRIAR / EDITAR SETOR / PARCELA      -->
+    <!-- ========================================== -->
+    <div id="parcel-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4 no-print">
+        <div class="bg-white rounded-2xl max-w-md w-full shadow-xl border border-slate-200 overflow-hidden">
+            <div class="px-5 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                <h3 class="font-bold text-slate-900 text-base" id="parcel-modal-title">Novo Setor / Parcela</h3>
+                <button onclick="closeParcelModal()" class="text-slate-400 hover:text-slate-700 p-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <form onsubmit="handleParcelSubmit(event)" class="p-5 space-y-4">
+                <input type="hidden" id="parcel-edit-id" value="">
+                
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Nome do Setor / Parcela *</label>
+                    <input type="text" id="parcel-name-input" required placeholder="Ex: Estufa 1, Túnel Sul, Painel Exterior Norte" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Tipo de Ambiente *</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="parcel-env" value="estufa" checked class="peer sr-only">
+                            <div class="p-2.5 rounded-xl border border-slate-300 peer-checked:border-sky-600 peer-checked:bg-sky-50 peer-checked:text-sky-900 text-center text-xs font-bold transition">
+                                Estufa
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="parcel-env" value="tunel" class="peer sr-only">
+                            <div class="p-2.5 rounded-xl border border-slate-300 peer-checked:border-indigo-600 peer-checked:bg-indigo-50 peer-checked:text-indigo-900 text-center text-xs font-bold transition">
+                                Túnel
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="parcel-env" value="exterior" class="peer sr-only">
+                            <div class="p-2.5 rounded-xl border border-slate-300 peer-checked:border-amber-600 peer-checked:bg-amber-50 peer-checked:text-amber-900 text-center text-xs font-bold transition">
+                                Ar Livre
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Área *</label>
+                        <input type="number" step="any" min="0.0001" id="parcel-area-input" required placeholder="Ex: 2500" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-bold focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Unidade</label>
+                        <select id="parcel-unit-input" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            <option value="m2">m²</option>
+                            <option value="ha">ha</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Cultura / Variedade *</label>
+                    <input type="text" id="parcel-crop-input" required placeholder="Ex: Ilex crenata, Morango, Tomate..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Notas do Setor</label>
+                    <input type="text" id="parcel-notes-input" placeholder="Ex: Rega gota-a-gota, tela anti-afídeo..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+
+                <div class="pt-3 flex justify-end gap-2 border-t border-slate-100">
+                    <button type="button" onclick="closeParcelModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 text-xs font-bold hover:bg-slate-50">Cancelar</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold">Guardar Setor</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL: CONFIRMAÇÃO GENÉRICA                -->
+    <!-- ========================================== -->
+    <div id="confirm-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4 no-print">
+        <div class="bg-white rounded-2xl max-w-sm w-full shadow-xl border border-slate-200 p-5 space-y-4">
+            <h3 class="font-bold text-slate-900 text-base" id="confirm-modal-title">Confirmar</h3>
+            <p class="text-sm text-slate-600" id="confirm-modal-msg">Tem a certeza?</p>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeConfirmModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 text-xs font-bold hover:bg-slate-50">Cancelar</button>
+                <button id="confirm-modal-btn" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-24 md:bottom-6 right-4 z-50 transform translate-y-28 opacity-0 transition-all duration-300 pointer-events-none no-print">
+        <div class="bg-slate-900 text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 border border-slate-700">
+            <svg class="w-5 h-5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span id="toast-msg" class="text-sm font-medium">Ação concluída</span>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- JAVASCRIPT: MOTOR AGROFIELD PRO            -->
+    <!-- ========================================== -->
+    <script>
+        const STORAGE_KEY = 'agroFieldPro_v1';
+        let currentCompressedPhotoDataUrl = '';
+        let confirmCallback = null;
+
+        // Datas relativas para dados de demonstração
+        function getRelativeDate(daysOffset) {
+            const d = new Date();
+            d.setDate(d.getDate() + daysOffset);
+            return d.toISOString().split('T')[0];
+        }
+
+        // Gerador leve de imagens ilustrativas em Canvas/SVG para a demonstração inicial
+        function createDemoSampleImage(bg1, bg2, label, sublabel) {
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="420" viewBox="0 0 640 420">
+                <defs>
+                    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="${bg1}"/>
+                        <stop offset="100%" stop-color="${bg2}"/>
+                    </linearGradient>
+                </defs>
+                <rect width="640" height="420" fill="url(#g)"/>
+                <circle cx="510" cy="95" r="70" fill="rgba(255,255,255,0.08)"/>
+                <path d="M120 340 Q240 160 360 290 T560 220" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="18" stroke-linecap="round"/>
+                <rect x="28" y="295" width="584" height="96" rx="16" fill="rgba(15,23,42,0.72)"/>
+                <text x="48" y="335" font-family="sans-serif" font-size="22" font-weight="bold" fill="#ffffff">${label}</text>
+                <text x="48" y="366" font-family="sans-serif" font-size="15" fill="#cbd5e1">${sublabel}</text>
+            </svg>`;
+            return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+        }
+
+        // Dados de Demonstração Realistas
+        function getInitialDemoData() {
+            return {
+                isDemo: true,
+                farmName: 'Exploração Agrícola & Viveiros',
+                parcels: [
+                    {
+                        id: 'p1',
+                        name: 'Estufa 1',
+                        environment: 'estufa',
+                        area: 2500,
+                        unit: 'm2',
+                        crop: 'Ilex crenata (Envasado)',
+                        notes: 'Rega gota-a-gota, bancadas elevadas'
+                    },
+                    {
+                        id: 'p2',
+                        name: 'Estufa 2',
+                        environment: 'estufa',
+                        area: 1800,
+                        unit: 'm2',
+                        crop: 'Buxus & Arbustos Ornamentais',
+                        notes: 'Setor de propagação e enraizamento'
+                    },
+                    {
+                        id: 'p3',
+                        name: 'Painel Exterior Norte',
+                        environment: 'exterior',
+                        area: 1.45,
+                        unit: 'ha',
+                        crop: 'Produção em Campo Aberto',
+                        notes: 'Exposição sul/norte, tela anti-infestantes'
+                    }
+                ],
+                scouting: [
+                    {
+                        id: 's1',
+                        date: getRelativeDate(-1),
+                        time: '09:40',
+                        parcelId: 'p1',
+                        category: 'Praga',
+                        severity: 'critico',
+                        status: 'aberto',
+                        title: 'Foco de Afídeos nos rebentos jovens',
+                        notes: 'Detetadas colónias na face inferior das folhas novas nas bancadas 3 e 4.',
+                        zoneNote: 'Bancada 4, junto à porta norte',
+                        lat: 38.758214,
+                        lng: -9.284512,
+                        accuracy: 6,
+                        photo: createDemoSampleImage('#065f46', '#15803d', 'Foco de Afídeos — Estufa 1', 'Exemplo de registo fotográfico georreferenciado')
+                    },
+                    {
+                        id: 's2',
+                        date: getRelativeDate(-2),
+                        time: '15:15',
+                        parcelId: 'p2',
+                        category: 'Auxiliares Biológicos',
+                        severity: 'baixo',
+                        status: 'aberto',
+                        title: 'Larvas de Cryptolaemus ativas sobre cochonilha',
+                        notes: 'Boa instalação dos auxiliares largados na semana passada. Manter monitorização.',
+                        zoneNote: 'Linha central, setor B',
+                        lat: 38.758610,
+                        lng: -9.284120,
+                        accuracy: 8,
+                        photo: createDemoSampleImage('#0369a1', '#0f766e', 'Auxiliares Biológicos Ativos — Estufa 2', 'Predação confirmada no terreno')
+                    },
+                    {
+                        id: 's3',
+                        date: getRelativeDate(-5),
+                        time: '11:05',
+                        parcelId: 'p3',
+                        category: 'Infestante',
+                        severity: 'medio',
+                        status: 'resolvido',
+                        title: 'Emergência de gramíneas nas entrelinhas',
+                        notes: 'Controlado com aplicação localizada de herbicida residual.',
+                        zoneNote: 'Cabeceira oeste do painel',
+                        lat: 38.759120,
+                        lng: -9.285340,
+                        accuracy: 5,
+                        photo: createDemoSampleImage('#92400e', '#b45309', 'Infestantes Entrelinha — Painel Norte', 'Ocorrência tratada e encerrada')
+                    }
+                ],
+                records: [
+                    {
+                        id: 'r1',
+                        type: 'tratamento',
+                        date: getRelativeDate(-2),
+                        parcelId: 'p1',
+                        product: 'Sivanto Prime (Flupiradifurona)',
+                        target: 'Afídeos / Piolho',
+                        dose: 0.75,
+                        unit: 'L/ha',
+                        volume: 200,
+                        isDays: 7,
+                        operator: 'Aplicador APF-4821',
+                        weather: 'Estufa ventilada, 21°C',
+                        notes: 'Aplicação foliar dirigida aos rebentos terminais.'
+                    },
+                    {
+                        id: 'r2',
+                        type: 'tratamento',
+                        date: getRelativeDate(-3),
+                        parcelId: 'p3',
+                        product: 'Stomp Aqua (Pendimetalina)',
+                        target: 'Infestantes anuais',
+                        dose: 2.5,
+                        unit: 'L/ha',
+                        volume: 600,
+                        isDays: 14,
+                        operator: 'Aplicador APF-4821',
+                        weather: 'Céu limpo, 18°C, vento 4 km/h',
+                        notes: 'Aplicação com campânula nas entrelinhas.'
+                    },
+                    {
+                        id: 'r3',
+                        type: 'fertilizacao',
+                        date: getRelativeDate(-4),
+                        parcelId: 'p1',
+                        method: 'Fertirrega Tanque 3000L',
+                        product: 'Basfoliar Kelp + Nitrato de Cálcio',
+                        dose: 4.5,
+                        unit: 'kg',
+                        water: 3000,
+                        notes: 'Reforço radicular e vegetativo.'
+                    },
+                    {
+                        id: 'r4',
+                        type: 'biologica',
+                        date: getRelativeDate(-6),
+                        parcelId: 'p2',
+                        organism: 'Cryptolaemus montrouzieri',
+                        qty: '2 frascos (1000 ind.)',
+                        notes: 'Largada preventiva nos focos de cochonilha.'
+                    }
+                ]
+            };
+        }
+
+        let appData = loadData();
+
+        function loadData() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (!parsed.scouting) parsed.scouting = [];
+                    if (!parsed.parcels) parsed.parcels = [];
+                    if (!parsed.records) parsed.records = [];
+                    return parsed;
+                }
+            } catch (e) {
+                console.error('Erro ao ler localStorage:', e);
+            }
+            const demo = getInitialDemoData();
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(demo));
+            return demo;
+        }
+
+        function saveData() {
+            try {
+                const serialized = JSON.stringify(appData);
+                localStorage.setItem(STORAGE_KEY, serialized);
+                updateStorageIndicator(serialized.length);
+            } catch (e) {
+                showToast('Atenção: Armazenamento local cheio! Exporte um backup e limpe fotos antigas.');
+            }
+            updateDemoUI();
+        }
+
+        function updateStorageIndicator(bytesLen) {
+            const kb = Math.round(bytesLen / 1024);
+            const el = document.getElementById('storage-usage-label');
+            if (el) el.textContent = kb > 1024 ? `${(kb / 1024).toFixed(1)} MB` : `${kb} KB`;
+        }
+
+        // Inicialização
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('rec-date').value = getRelativeDate(0);
+            updateDemoUI();
+            updateStorageIndicator(JSON.stringify(appData).length);
+            refreshAllViews();
+        });
+
+        // Alternar Vistas
+        function switchView(viewName) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            const target = document.getElementById(`view-${viewName}`);
+            if (target) target.classList.remove('hidden');
+
+            // Desktop Nav
+            document.querySelectorAll('.nav-desk-btn').forEach(btn => {
+                btn.className = 'nav-desk-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold transition text-emerald-200 hover:bg-emerald-900/60 hover:text-white';
+            });
+            const activeDesk = document.getElementById(`nav-desk-${viewName}`);
+            if (activeDesk) {
+                activeDesk.className = 'nav-desk-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold transition bg-emerald-800 text-white shadow-xs';
+            }
+
+            // Mobile Nav
+            document.querySelectorAll('.nav-mob-btn').forEach(btn => {
+                btn.className = 'nav-mob-btn relative flex flex-col items-center justify-center p-1.5 rounded-xl text-slate-500 font-medium w-1/5';
+            });
+            const activeMob = document.getElementById(`nav-mob-${viewName}`);
+            if (activeMob) {
+                activeMob.className = 'nav-mob-btn relative flex flex-col items-center justify-center p-1.5 rounded-xl text-emerald-700 font-bold w-1/5 bg-emerald-50';
+            }
+
+            const subtitles = {
+                'dashboard': 'Painel Geral',
+                'scouting': 'Scouting & Fotos Georreferenciadas',
+                'new-record': 'Registar Operação no Caderno',
+                'history': 'Histórico Caderno de Campo',
+                'parcels': 'Setores & Parcelas'
+            };
+            document.getElementById('mobile-header-subtitle').textContent = subtitles[viewName] || 'AgroField Pro';
+
+            refreshAllViews();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function refreshAllViews() {
+            populateAllParcelSelects();
+            updateScoutingBadges();
+            renderDashboard();
+            renderScoutingList();
+            renderHistory();
+            renderParcelsGrid();
+        }
+
+        function updateDemoUI() {
+            const banner = document.getElementById('demo-banner');
+            const btnTop = document.getElementById('btn-clear-demo-top');
+            const btnMob = document.getElementById('btn-clear-demo-mob');
+            if (appData.isDemo) {
+                banner.classList.remove('hidden');
+                if (btnTop) btnTop.classList.remove('hidden');
+                if (btnMob) btnMob.classList.remove('hidden');
+            } else {
+                banner.classList.add('hidden');
+                if (btnTop) btnTop.classList.add('hidden');
+                if (btnMob) btnMob.classList.add('hidden');
+            }
+        }
+
+        function openClearDemoModal() {
+            showConfirmModal(
+                'Limpar Dados de Demonstração?',
+                'Isto irá remover os setores, registos e fotos de exemplo para que possa iniciar o seu próprio caderno de campo.',
+                () => {
+                    appData.parcels = [];
+                    appData.records = [];
+                    appData.scouting = [];
+                    appData.isDemo = false;
+                    saveData();
+                    refreshAllViews();
+                    showToast('Dados de exemplo limpos! Pronto a usar.');
+                }
+            );
+        }
+
+        // ==========================================
+        // CÁLCULO DE INTERVALOS DE SEGURANÇA (IS)
+        // ==========================================
+        function getParcelSafetyStatus(parcelId) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            let restrictions = [];
+
+            appData.records.forEach(rec => {
+                if (rec.type === 'tratamento' && rec.parcelId === parcelId && Number(rec.isDays) > 0) {
+                    const treatDate = new Date(rec.date + 'T00:00:00');
+                    const releaseDate = new Date(treatDate);
+                    releaseDate.setDate(releaseDate.getDate() + Number(rec.isDays));
+
+                    if (releaseDate > today) {
+                        const daysLeft = Math.ceil((releaseDate - today) / (1000 * 60 * 60 * 24));
+                        restrictions.push({
+                            product: rec.product,
+                            releaseDate: releaseDate.toISOString().split('T')[0],
+                            daysLeft
+                        });
+                    }
+                }
+            });
+
+            if (restrictions.length === 0) return { blocked: false };
+            restrictions.sort((a, b) => b.daysLeft - a.daysLeft);
+            return { blocked: true, latestRelease: restrictions[0] };
+        }
+
+        // ==========================================
+        // PAINEL GERAL (DASHBOARD)
+        // ==========================================
+        function renderDashboard() {
+            const totalParcels = appData.parcels.length;
+            const estufasCount = appData.parcels.filter(p => p.environment === 'estufa' || p.environment === 'tunel').length;
+            const exteriorCount = appData.parcels.filter(p => p.environment === 'exterior').length;
+
+            let totalHa = 0;
+            appData.parcels.forEach(p => {
+                totalHa += p.unit === 'ha' ? Number(p.area) : (Number(p.area) / 10000);
+            });
+
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            const recentTreatments = appData.records.filter(r => r.type === 'tratamento' && new Date(r.date) >= thirtyDaysAgo).length;
+
+            const openScouting = appData.scouting.filter(s => s.status === 'aberto');
+            const criticalScouting = openScouting.filter(s => s.severity === 'critico').length;
+
+            document.getElementById('kpi-total-parcels').textContent = totalParcels;
+            document.getElementById('kpi-parcels-breakdown').textContent = `${estufasCount} estufa/túnel · ${exteriorCount} ar livre`;
+            document.getElementById('kpi-total-ha').textContent = `${formatNum(totalHa, 2)} ha`;
+            document.getElementById('kpi-total-m2').textContent = `${formatNum(totalHa * 10000, 0)} m²`;
+            document.getElementById('kpi-month-treatments').textContent = recentTreatments;
+            document.getElementById('kpi-total-records').textContent = `${appData.records.length} registos totais`;
+            document.getElementById('kpi-scouting-open').textContent = openScouting.length;
+            document.getElementById('kpi-scouting-sub').textContent = `${criticalScouting} crítico(s) · em aberto`;
+
+            const scoutCard = document.getElementById('kpi-scouting-card');
+            if (criticalScouting > 0) {
+                scoutCard.classList.add('border-amber-400', 'bg-amber-50/40');
+            } else {
+                scoutCard.classList.remove('border-amber-400', 'bg-amber-50/40');
+            }
+
+            // Semáforo de Intervalos de Segurança
+            const statusContainer = document.getElementById('dashboard-parcels-status');
+            if (appData.parcels.length === 0) {
+                statusContainer.innerHTML = `<div class="col-span-full text-center py-6 text-sm text-slate-500">Ainda não tem setores configurados. <button onclick="switchView('parcels')" class="text-emerald-700 font-bold underline">Criar primeiro setor</button>.</div>`;
+            } else {
+                statusContainer.innerHTML = appData.parcels.map(p => {
+                    const status = getParcelSafetyStatus(p.id);
+                    const envLabel = getEnvBadgeHTML(p.environment);
+                    const areaStr = p.unit === 'ha' ? `${formatNum(p.area, 2)} ha` : `${formatNum(p.area, 0)} m²`;
+
+                    if (status.blocked) {
+                        const rest = status.latestRelease;
+                        return `
+                        <div class="rounded-xl border-2 border-rose-200 bg-rose-50/50 p-4 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 mb-1.5">
+                                    ${envLabel}
+                                    <span class="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-rose-600 text-white">
+                                        EM CARÊNCIA: ${rest.daysLeft}d
+                                    </span>
+                                </div>
+                                <h4 class="font-bold text-slate-900 text-base">${escapeHtml(p.name)}</h4>
+                                <p class="text-xs text-slate-600 font-medium">${escapeHtml(p.crop)} · ${areaStr}</p>
+                            </div>
+                            <div class="mt-3 pt-2.5 border-t border-rose-200/80 text-xs text-rose-900">
+                                <p class="font-bold">Libertação: ${formatDatePT(rest.releaseDate)}</p>
+                                <p class="text-[11px] text-rose-700 truncate">Produto: ${escapeHtml(rest.product)}</p>
+                            </div>
+                        </div>`;
+                    } else {
+                        return `
+                        <div class="rounded-xl border border-slate-200 bg-slate-50/60 p-4 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 mb-1.5">
+                                    ${envLabel}
+                                    <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                                        ✓ Livre (Sem Carência)
+                                    </span>
+                                </div>
+                                <h4 class="font-bold text-slate-900 text-base">${escapeHtml(p.name)}</h4>
+                                <p class="text-xs text-slate-600 font-medium">${escapeHtml(p.crop)} · ${areaStr}</p>
+                            </div>
+                            <div class="mt-3 pt-2.5 border-t border-slate-200/80 text-xs text-slate-500 flex justify-between items-center">
+                                <span>Sem restrições ativas</span>
+                                <button onclick="openNewScoutingModal('${p.id}')" class="text-emerald-700 font-bold hover:underline">+ Foto Scouting</button>
+                            </div>
+                        </div>`;
+                    }
+                }).join('');
+            }
+
+            // Mini-galeria de Últimas Notas de Scouting
+            const previewContainer = document.getElementById('dashboard-scouting-preview');
+            const recentScouting = [...appData.scouting].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 3);
+
+            if (recentScouting.length === 0) {
+                previewContainer.innerHTML = `<div class="col-span-full text-center py-6 text-sm text-slate-400">Nenhuma nota de scouting registada. Use o botão "Nova Nota Foto + GPS" no campo.</div>`;
+            } else {
+                previewContainer.innerHTML = recentScouting.map(s => renderScoutingCardHTML(s, true)).join('');
+            }
+        }
+
+        // ==========================================
+        // SCOUTING & FOTOS (CAPTURA, COMPRESSÃO, GPS)
+        // ==========================================
+        function updateScoutingBadges() {
+            const openCount = appData.scouting.filter(s => s.status === 'aberto').length;
+            const deskBadge = document.getElementById('badge-open-scouting-desk');
+            const mobBadge = document.getElementById('badge-open-scouting-mob');
+            if (openCount > 0) {
+                deskBadge.textContent = openCount;
+                deskBadge.classList.remove('hidden');
+                mobBadge.classList.remove('hidden');
+            } else {
+                deskBadge.classList.add('hidden');
+                mobBadge.classList.add('hidden');
+            }
+        }
+
+        function openNewScoutingModal(preselectedParcelId = null) {
+            populateAllParcelSelects();
+            if (preselectedParcelId) {
+                document.getElementById('scout-parcel').value = preselectedParcelId;
+            }
+            clearSelectedPhoto();
+            document.getElementById('scout-lat').value = '';
+            document.getElementById('scout-lng').value = '';
+            document.getElementById('scout-acc').value = '';
+            document.getElementById('gps-status-box').innerHTML = 'Toque em "Obter Coordenadas GPS" para gravar o pin exato no mapa.';
+            document.getElementById('scout-zone-note').value = '';
+            document.getElementById('scout-title').value = '';
+            document.getElementById('scout-notes').value = '';
+            document.querySelector('input[name="scout-severity"][value="medio"]').checked = true;
+            document.getElementById('scout-status').value = 'aberto';
+
+            const modal = document.getElementById('scouting-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeNewScoutingModal() {
+            const modal = document.getElementById('scouting-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // Compressão Client-Side de Imagem (Max 800px, JPEG 0.75) para caber no localStorage
+        function handlePhotoSelected(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const MAX_DIM = 800;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_DIM) {
+                            height = Math.round((height * MAX_DIM) / width);
+                            width = MAX_DIM;
+                        }
+                    } else {
+                        if (height > MAX_DIM) {
+                            width = Math.round((width * MAX_DIM) / height);
+                            height = MAX_DIM;
+                        }
+                    }
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    currentCompressedPhotoDataUrl = canvas.toDataURL('image/jpeg', 0.75);
+                    const approxKB = Math.round((currentCompressedPhotoDataUrl.length * 3) / 4 / 1024);
+
+                    document.getElementById('scout-photo-preview').src = currentCompressedPhotoDataUrl;
+                    document.getElementById('photo-size-badge').textContent = `${width}×${height}px · ~${approxKB} KB`;
+                    document.getElementById('photo-capture-area').classList.add('hidden');
+                    document.getElementById('photo-preview-wrap').classList.remove('hidden');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearSelectedPhoto() {
+            currentCompressedPhotoDataUrl = '';
+            document.getElementById('scout-photo-input').value = '';
+            document.getElementById('scout-photo-preview').src = '';
+            document.getElementById('photo-preview-wrap').classList.add('hidden');
+            document.getElementById('photo-capture-area').classList.remove('hidden');
+        }
+
+        // Geolocalização GPS
+        function fetchGPSCoordinates() {
+            const statusBox = document.getElementById('gps-status-box');
+            const btn = document.getElementById('btn-get-gps');
+
+            if (!('geolocation' in navigator)) {
+                statusBox.innerHTML = `<span class="text-rose-600 font-semibold">Geolocalização não suportada neste navegador.</span>`;
+                return;
+            }
+
+            btn.disabled = true;
+            btn.classList.add('opacity-70');
+            statusBox.innerHTML = `<span class="text-emerald-700 font-semibold animate-pulse">A obter sinal de satélite GPS...</span>`;
+
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-70');
+
+                    const lat = pos.coords.latitude.toFixed(6);
+                    const lng = pos.coords.longitude.toFixed(6);
+                    const acc = Math.round(pos.coords.accuracy);
+
+                    document.getElementById('scout-lat').value = lat;
+                    document.getElementById('scout-lng').value = lng;
+                    document.getElementById('scout-acc').value = acc;
+
+                    statusBox.innerHTML = `
+                        <div class="flex flex-wrap items-center justify-between gap-2 bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2 text-emerald-950">
+                            <div>
+                                <span class="font-bold">Lat: ${lat}, Lng: ${lng}</span>
+                                <span class="text-[11px] text-emerald-700 ml-1">(± ${acc} m)</span>
+                            </div>
+                            <a href="https://maps.google.com/?q=${lat},${lng}" target="_blank" rel="noopener" class="text-xs font-extrabold text-emerald-700 underline">
+                                Abrir no Google Maps ↗
+                            </a>
+                        </div>`;
+                    showToast('Coordenadas GPS capturadas!');
+                },
+                (err) => {
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-70');
+                    statusBox.innerHTML = `<span class="text-rose-600 font-semibold">Não foi possível obter GPS (${err.message}). Pode preencher a referência manual abaixo.</span>`;
+                },
+                { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
+            );
+        }
+
+        function handleScoutingSubmit(e) {
+            e.preventDefault();
+            const parcelId = document.getElementById('scout-parcel').value;
+            const category = document.getElementById('scout-category').value;
+            const severity = document.querySelector('input[name="scout-severity"]:checked').value;
+            const status = document.getElementById('scout-status').value;
+            const title = document.getElementById('scout-title').value.trim();
+            const notes = document.getElementById('scout-notes').value.trim();
+            const zoneNote = document.getElementById('scout-zone-note').value.trim();
+            const lat = document.getElementById('scout-lat').value ? parseFloat(document.getElementById('scout-lat').value) : null;
+            const lng = document.getElementById('scout-lng').value ? parseFloat(document.getElementById('scout-lng').value) : null;
+            const accuracy = document.getElementById('scout-acc').value ? parseInt(document.getElementById('scout-acc').value, 10) : null;
+
+            if (!parcelId || !title) {
+                showToast('Selecione o setor e descreva a ocorrência.');
+                return;
+            }
+
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
+
+            const newNote = {
+                id: 's_' + Date.now(),
+                date: getRelativeDate(0),
+                time: timeStr,
+                parcelId,
+                category,
+                severity,
+                status,
+                title,
+                notes,
+                zoneNote,
+                lat,
+                lng,
+                accuracy,
+                photo: currentCompressedPhotoDataUrl || ''
+            };
+
+            appData.scouting.unshift(newNote);
+            saveData();
+            closeNewScoutingModal();
+            refreshAllViews();
+            showToast('Nota de Scouting guardada!');
+        }
+
+        function renderScoutingList() {
+            const pFilter = document.getElementById('scout-filter-parcel').value;
+            const cFilter = document.getElementById('scout-filter-category').value;
+            const sFilter = document.getElementById('scout-filter-severity').value;
+            const stFilter = document.getElementById('scout-filter-status').value;
+
+            let list = [...appData.scouting].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            if (pFilter !== 'all') list = list.filter(s => s.parcelId === pFilter);
+            if (cFilter !== 'all') list = list.filter(s => s.category === cFilter);
+            if (sFilter !== 'all') list = list.filter(s => s.severity === sFilter);
+            if (stFilter !== 'all') list = list.filter(s => s.status === stFilter);
+
+            const grid = document.getElementById('scouting-cards-grid');
+            if (list.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full bg-white rounded-2xl border-2 border-dashed border-slate-300 p-10 text-center">
+                        <h3 class="font-bold text-slate-800 text-base mb-1">Nenhuma nota de scouting encontrada</h3>
+                        <p class="text-sm text-slate-500 mb-4">Registe pragas, doenças ou anomalias com fotografia e GPS diretamente no campo.</p>
+                        <button onclick="openNewScoutingModal()" class="px-4 py-2.5 rounded-xl bg-amber-500 text-emerald-950 text-sm font-extrabold hover:bg-amber-400">+ Nova Nota de Scouting</button>
+                    </div>`;
+                return;
+            }
+
+            grid.innerHTML = list.map(s => renderScoutingCardHTML(s, false)).join('');
+        }
+
+        function renderScoutingCardHTML(s, isCompact) {
+            const parcel = appData.parcels.find(p => p.id === s.parcelId);
+            const parcelName = parcel ? parcel.name : 'Setor removido';
+
+            const sevMap = {
+                'critico': { label: 'Crítico', cls: 'bg-rose-600 text-white' },
+                'medio': { label: 'Médio', cls: 'bg-amber-400 text-amber-950' },
+                'baixo': { label: 'Baixo', cls: 'bg-emerald-100 text-emerald-800' }
+            };
+            const sev = sevMap[s.severity] || sevMap['medio'];
+
+            const isResolved = s.status === 'resolvido';
+            const hasPhoto = Boolean(s.photo);
+            const hasGPS = s.lat !== null && s.lng !== null && !isNaN(s.lat);
+
+            const photoBlock = hasPhoto
+                ? `<div onclick="openLightbox('${s.id}')" class="relative h-44 bg-slate-900 cursor-pointer group overflow-hidden">
+                        <img src="${s.photo}" alt="${escapeHtml(s.title)}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20"></div>
+                        <span class="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-lg text-[11px] font-extrabold shadow-xs ${sev.cls}">${sev.label}</span>
+                        <span class="absolute top-2.5 right-2.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-black/65 text-white backdrop-blur-xs">${escapeHtml(s.category)}</span>
+                        <div class="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between text-white text-[11px]">
+                            <span class="font-semibold">${formatDatePT(s.date)} ${s.time ? '· ' + s.time : ''}</span>
+                            <span class="bg-white/20 px-2 py-0.5 rounded backdrop-blur-xs">Ampliar 🔍</span>
+                        </div>
+                   </div>`
+                : `<div class="p-4 bg-slate-100 border-b border-slate-200 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2.5 py-1 rounded-lg text-[11px] font-extrabold ${sev.cls}">${sev.label}</span>
+                            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-white text-slate-700 border border-slate-200">${escapeHtml(s.category)}</span>
+                        </div>
+                        <span class="text-[11px] font-semibold text-slate-500">${formatDatePT(s.date)}</span>
+                   </div>`;
+
+            const gpsBadge = hasGPS
+                ? `<a href="https://maps.google.com/?q=${s.lat},${s.lng}" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-[11px] font-bold text-sky-700 bg-sky-50 hover:bg-sky-100 border border-sky-200 px-2.5 py-1 rounded-lg transition">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        <span>${s.lat.toFixed(4)}, ${s.lng.toFixed(4)} · Mapa ↗</span>
+                   </a>`
+                : (s.zoneNote ? `<span class="inline-block text-[11px] font-semibold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg">📍 ${escapeHtml(s.zoneNote)}</span>` : '');
+
+            const actionFooter = isCompact ? '' : `
+                <div class="pt-3 mt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 no-print">
+                    <button onclick="toggleScoutingStatus('${s.id}')" class="px-3 py-1.5 rounded-xl text-xs font-bold transition ${isResolved ? 'bg-slate-100 text-slate-700 hover:bg-slate-200' : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200'}">
+                        ${isResolved ? '↺ Reabrir Nota' : '✓ Marcar Resolvido'}
+                    </button>
+                    <div class="flex items-center gap-1.5">
+                        ${!isResolved ? `<button onclick="convertScoutingToTreatment('${s.id}')" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition">Tratar →</button>` : ''}
+                        <button onclick="deleteScoutingNote('${s.id}')" title="Apagar nota" class="p-1.5 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        </button>
+                    </div>
+                </div>`;
+
+            return `
+            <div class="bg-white rounded-2xl border ${isResolved ? 'border-slate-200 opacity-75' : 'border-slate-200'} shadow-sm overflow-hidden flex flex-col justify-between">
+                <div>
+                    ${photoBlock}
+                    <div class="p-4 space-y-2">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-xs font-extrabold text-emerald-800 uppercase tracking-wide">${escapeHtml(parcelName)}</span>
+                            <span class="text-[11px] font-bold px-2 py-0.5 rounded-md ${isResolved ? 'bg-slate-200 text-slate-700' : 'bg-amber-100 text-amber-900'}">
+                                ${isResolved ? 'Resolvido' : 'Aberto'}
+                            </span>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-base leading-snug">${escapeHtml(s.title)}</h4>
+                        ${s.notes ? `<p class="text-xs text-slate-600 line-clamp-2">${escapeHtml(s.notes)}</p>` : ''}
+                        <div class="pt-1 flex flex-wrap gap-1.5">
+                            ${gpsBadge}
+                            ${hasGPS && s.zoneNote ? `<span class="text-[11px] text-slate-500 bg-slate-100 px-2 py-1 rounded-lg">${escapeHtml(s.zoneNote)}</span>` : ''}
+                        </div>
+                    </div>
+                </div>
+                ${actionFooter ? `<div class="px-4 pb-4">${actionFooter}</div>` : ''}
+            </div>`;
+        }
+
+        function toggleScoutingStatus(id) {
+            const item = appData.scouting.find(s => s.id === id);
+            if (!item) return;
+            item.status = item.status === 'aberto' ? 'resolvido' : 'aberto';
+            saveData();
+            refreshAllViews();
+            showToast(item.status === 'resolvido' ? 'Nota marcada como resolvida!' : 'Nota reaberta.');
+        }
+
+        function deleteScoutingNote(id) {
+            showConfirmModal(
+                'Eliminar Nota de Scouting?',
+                'Esta fotografia e respetiva nota georreferenciada serão apagadas permanentemente.',
+                () => {
+                    appData.scouting = appData.scouting.filter(s => s.id !== id);
+                    saveData();
+                    refreshAllViews();
+                    showToast('Nota de scouting eliminada.');
+                }
+            );
+        }
+
+        // Converter Nota de Scouting diretamente em Tratamento no Caderno de Campo
+        function convertScoutingToTreatment(scoutingId) {
+            const scout = appData.scouting.find(s => s.id === scoutingId);
+            if (!scout) return;
+
+            switchView('new-record');
+            selectOperationType('tratamento');
+
+            document.getElementById('rec-parcel').value = scout.parcelId;
+            document.getElementById('fito-target').value = scout.title;
+            document.getElementById('rec-notes').value = `Ação corretiva referente ao scouting (${formatDatePT(scout.date)}): ${scout.notes || scout.title}`;
+            document.getElementById('rec-linked-scout-id').value = scout.id;
+
+            document.getElementById('scouting-linked-badge').classList.remove('hidden');
+            document.getElementById('resolve-scout-checkbox-wrap').classList.remove('hidden');
+            document.getElementById('rec-resolve-scout').checked = true;
+
+            showToast('Dados importados do Scouting para o formulário de tratamento.');
+        }
+
+        function clearLinkedScouting() {
+            document.getElementById('rec-linked-scout-id').value = '';
+            document.getElementById('scouting-linked-badge').classList.add('hidden');
+            document.getElementById('resolve-scout-checkbox-wrap').classList.add('hidden');
+        }
+
+        // Lightbox para visualizar foto em tamanho completo
+        function openLightbox(scoutingId) {
+            const s = appData.scouting.find(item => item.id === scoutingId);
+            if (!s || !s.photo) return;
+            const parcel = appData.parcels.find(p => p.id === s.parcelId);
+
+            document.getElementById('lb-image').src = s.photo;
+            document.getElementById('lb-title').textContent = s.title;
+            document.getElementById('lb-subtitle').textContent = `${parcel ? parcel.name : ''} · ${s.category} · ${formatDatePT(s.date)} ${s.time || ''}`;
+            document.getElementById('lb-notes').textContent = s.notes || 'Sem observações adicionais.';
+
+            const footer = document.getElementById('lb-footer');
+            if (s.lat !== null && s.lng !== null && !isNaN(s.lat)) {
+                footer.innerHTML = `
+                    <span>GPS: <strong>${s.lat.toFixed(6)}, ${s.lng.toFixed(6)}</strong> ${s.accuracy ? `(±${s.accuracy}m)` : ''} ${s.zoneNote ? '· ' + escapeHtml(s.zoneNote) : ''}</span>
+                    <a href="https://maps.google.com/?q=${s.lat},${s.lng}" target="_blank" rel="noopener" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold">
+                        Ver Pin no Google Maps ↗
+                    </a>`;
+            } else {
+                footer.innerHTML = `<span>${s.zoneNote ? 'Localização: ' + escapeHtml(s.zoneNote) : 'Sem coordenadas GPS associadas'}</span>`;
+            }
+
+            const modal = document.getElementById('lightbox-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeLightbox() {
+            const modal = document.getElementById('lightbox-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // ==========================================
+        // FORMULÁRIO CADERNO DE CAMPO
+        // ==========================================
+        function selectOperationType(type) {
+            document.getElementById('rec-type').value = type;
+            document.querySelectorAll('.op-tab-btn').forEach(btn => {
+                btn.className = 'op-tab-btn p-4 rounded-2xl border border-slate-200 bg-white hover:border-emerald-300 text-left transition';
+            });
+            const active = document.getElementById(`op-tab-${type}`);
+            if (active) {
+                active.className = 'op-tab-btn p-4 rounded-2xl border-2 border-emerald-600 bg-emerald-50/70 text-left transition shadow-sm';
+            }
+            document.querySelectorAll('.op-fields').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`fields-${type}`).classList.remove('hidden');
+        }
+
+        function handleRecordSubmit(e) {
+            e.preventDefault();
+            const type = document.getElementById('rec-type').value;
+            const date = document.getElementById('rec-date').value;
+            const parcelId = document.getElementById('rec-parcel').value;
+            const notes = document.getElementById('rec-notes').value.trim();
+            const linkedScoutId = document.getElementById('rec-linked-scout-id').value;
+
+            if (!parcelId) {
+                showToast('Selecione um setor ou parcela primeiro.');
+                return;
+            }
+
+            const rec = {
+                id: 'r_' + Date.now(),
+                type,
+                date,
+                parcelId,
+                notes
+            };
+
+            if (type === 'tratamento') {
+                const product = document.getElementById('fito-product').value.trim();
+                const target = document.getElementById('fito-target').value.trim();
+                const dose = parseFloat(document.getElementById('fito-dose').value);
+                if (!product || isNaN(dose)) {
+                    showToast('Indique o produto comercial e a dose.');
+                    return;
+                }
+                rec.product = product;
+                rec.target = target || 'Geral';
+                rec.dose = dose;
+                rec.unit = document.getElementById('fito-unit').value;
+                rec.volume = parseFloat(document.getElementById('fito-volume').value) || 0;
+                rec.isDays = parseInt(document.getElementById('fito-is').value, 10) || 0;
+                rec.operator = document.getElementById('fito-operator').value.trim();
+                rec.weather = document.getElementById('fito-weather').value.trim();
+            } else if (type === 'fertilizacao') {
+                const product = document.getElementById('fert-product').value.trim();
+                const dose = parseFloat(document.getElementById('fert-dose').value);
+                if (!product || isNaN(dose)) {
+                    showToast('Indique o fertilizante e a dose.');
+                    return;
+                }
+                rec.method = document.getElementById('fert-method').value;
+                rec.product = product;
+                rec.dose = dose;
+                rec.unit = document.getElementById('fert-unit').value;
+                rec.water = parseFloat(document.getElementById('fert-water').value) || 0;
+            } else if (type === 'rega') {
+                const amount = document.getElementById('rega-amount').value.trim();
+                if (!amount) {
+                    showToast('Indique a dotação ou duração de rega.');
+                    return;
+                }
+                rec.amount = amount;
+                rec.ec = document.getElementById('rega-ec').value.trim();
+                rec.ph = document.getElementById('rega-ph').value.trim();
+            } else if (type === 'biologica') {
+                const organism = document.getElementById('bio-organism').value.trim();
+                const qty = document.getElementById('bio-qty').value.trim();
+                if (!organism || !qty) {
+                    showToast('Indique o organismo auxiliar e a quantidade.');
+                    return;
+                }
+                rec.organism = organism;
+                rec.qty = qty;
+            }
+
+            appData.records.unshift(rec);
+
+            // Se estava vinculado a uma nota de scouting e o utilizador deixou marcado para resolver
+            if (linkedScoutId && document.getElementById('rec-resolve-scout').checked) {
+                const sItem = appData.scouting.find(s => s.id === linkedScoutId);
+                if (sItem) sItem.status = 'resolvido';
+            }
+
+            saveData();
+
+            // Limpar formulário
+            document.getElementById('fito-product').value = '';
+            document.getElementById('fito-target').value = '';
+            document.getElementById('fito-dose').value = '';
+            document.getElementById('fito-is').value = '0';
+            document.getElementById('fert-product').value = '';
+            document.getElementById('fert-dose').value = '';
+            document.getElementById('rega-amount').value = '';
+            document.getElementById('bio-organism').value = '';
+            document.getElementById('bio-qty').value = '';
+            document.getElementById('rec-notes').value = '';
+            clearLinkedScouting();
+
+            showToast('Operação registada no Caderno de Campo!');
+            switchView('dashboard');
+        }
+
+        // ==========================================
+        // HISTÓRICO CADERNO DE CAMPO
+        // ==========================================
+        function renderHistory() {
+            const search = (document.getElementById('filter-search').value || '').toLowerCase();
+            const parcelFilter = document.getElementById('filter-parcel').value;
+            const typeFilter = document.getElementById('filter-type').value;
+            const dateFrom = document.getElementById('filter-date-from').value;
+
+            let filtered = [...appData.records].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            if (parcelFilter !== 'all') filtered = filtered.filter(r => r.parcelId === parcelFilter);
+            if (typeFilter !== 'all') filtered = filtered.filter(r => r.type === typeFilter);
+            if (dateFrom) filtered = filtered.filter(r => r.date >= dateFrom);
+            if (search) {
+                filtered = filtered.filter(r => JSON.stringify(r).toLowerCase().includes(search));
+            }
+
+            const tbody = document.getElementById('history-tbody');
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="py-10 text-center text-slate-400 text-sm">Nenhum registo encontrado com os filtros aplicados.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(rec => {
+                const parcel = appData.parcels.find(p => p.id === rec.parcelId);
+                const pName = parcel ? parcel.name : 'Setor removido';
+                const pCrop = parcel ? parcel.crop : '';
+
+                let badge = '', title = '', sub = '', qty = '', extra = '';
+
+                if (rec.type === 'tratamento') {
+                    badge = `<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-100 text-rose-800">Fitossanitário</span>`;
+                    title = rec.product;
+                    sub = `Alvo: ${rec.target}${rec.operator ? ' · ' + rec.operator : ''}`;
+                    qty = `${formatNum(rec.dose, 2)} ${rec.unit}${rec.volume ? ` (${rec.volume}L)` : ''}`;
+                    if (Number(rec.isDays) > 0) {
+                        const rel = new Date(rec.date + 'T00:00:00');
+                        rel.setDate(rel.getDate() + Number(rec.isDays));
+                        extra += `<span class="inline-block text-[11px] font-bold text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded mb-1">IS: ${rec.isDays}d (Livre: ${formatDatePT(rel.toISOString().split('T')[0])})</span><br>`;
+                    }
+                    if (rec.weather) extra += `<span class="text-xs text-slate-500 block">Meteo: ${escapeHtml(rec.weather)}</span>`;
+                } else if (rec.type === 'fertilizacao') {
+                    badge = `<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-100 text-amber-800">Fertilização</span>`;
+                    title = rec.product;
+                    sub = `${rec.method}${rec.water ? ` · Tanque ${rec.water}L` : ''}`;
+                    qty = `${formatNum(rec.dose, 2)} ${rec.unit}`;
+                } else if (rec.type === 'rega') {
+                    badge = `<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-sky-100 text-sky-800">Rega</span>`;
+                    title = `Dotação: ${rec.amount}`;
+                    sub = [rec.ec ? `EC: ${rec.ec}` : '', rec.ph ? `pH: ${rec.ph}` : ''].filter(Boolean).join(' · ') || 'Rega';
+                    qty = rec.amount;
+                } else {
+                    badge = `<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800">Luta Biológica</span>`;
+                    title = rec.organism;
+                    sub = 'Largada de auxiliares';
+                    qty = rec.qty;
+                }
+
+                if (rec.notes) {
+                    extra += `<span class="text-xs text-slate-600 italic">${escapeHtml(rec.notes)}</span>`;
+                }
+
+                return `
+                <tr class="hover:bg-slate-50/80 transition print-break-avoid">
+                    <td class="py-3.5 px-4 font-bold text-slate-900 whitespace-nowrap">${formatDatePT(rec.date)}</td>
+                    <td class="py-3.5 px-4">
+                        <div class="font-bold text-slate-800">${escapeHtml(pName)}</div>
+                        <div class="text-xs text-slate-500">${escapeHtml(pCrop)}</div>
+                    </td>
+                    <td class="py-3.5 px-4 whitespace-nowrap">${badge}</td>
+                    <td class="py-3.5 px-4">
+                        <div class="font-bold text-slate-900">${escapeHtml(title)}</div>
+                        <div class="text-xs text-slate-500">${escapeHtml(sub)}</div>
+                    </td>
+                    <td class="py-3.5 px-4 font-bold text-slate-800 whitespace-nowrap">${escapeHtml(qty)}</td>
+                    <td class="py-3.5 px-4 max-w-xs">${extra || '<span class="text-slate-400 text-xs">—</span>'}</td>
+                    <td class="py-3.5 px-4 text-right no-print">
+                        <button onclick="deleteRecord('${rec.id}')" title="Eliminar registo" class="p-2 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        </button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function deleteRecord(id) {
+            showConfirmModal(
+                'Eliminar Registo?',
+                'Pretende apagar este registo do Caderno de Campo?',
+                () => {
+                    appData.records = appData.records.filter(r => r.id !== id);
+                    saveData();
+                    refreshAllViews();
+                    showToast('Registo eliminado.');
+                }
+            );
+        }
+
+        // ==========================================
+        // SETORES & PARCELAS
+        // ==========================================
+        function populateAllParcelSelects() {
+            const selects = ['rec-parcel', 'scout-parcel'];
+            selects.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const prev = el.value;
+                if (appData.parcels.length === 0) {
+                    el.innerHTML = `<option value="">-- Crie primeiro um setor --</option>`;
+                } else {
+                    el.innerHTML = appData.parcels.map(p => `<option value="${p.id}">${escapeHtml(p.name)} (${escapeHtml(p.crop)})</option>`).join('');
+                    if (prev && appData.parcels.some(p => p.id === prev)) el.value = prev;
+                }
+            });
+
+            const filterSelects = ['filter-parcel', 'scout-filter-parcel'];
+            filterSelects.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const prev = el.value;
+                el.innerHTML = `<option value="all">Todos os setores</option>` +
+                    appData.parcels.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
+                if (prev) el.value = prev;
+            });
+        }
+
+        function getEnvBadgeHTML(env) {
+            if (env === 'estufa') return `<span class="text-[11px] font-bold px-2.5 py-0.5 rounded-md bg-sky-100 text-sky-800">Estufa</span>`;
+            if (env === 'tunel') return `<span class="text-[11px] font-bold px-2.5 py-0.5 rounded-md bg-indigo-100 text-indigo-800">Túnel</span>`;
+            return `<span class="text-[11px] font-bold px-2.5 py-0.5 rounded-md bg-amber-100 text-amber-800">Ar Livre</span>`;
+        }
+
+        function renderParcelsGrid() {
+            const grid = document.getElementById('parcels-grid');
+            if (appData.parcels.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full bg-white rounded-2xl border-2 border-dashed border-slate-300 p-10 text-center">
+                        <h3 class="font-bold text-slate-800 text-base mb-1">Nenhum setor configurado</h3>
+                        <p class="text-sm text-slate-500 mb-4">Crie estufas, túneis ou parcelas ao ar livre para gerir operações e scouting.</p>
+                        <button onclick="openParcelModal()" class="px-4 py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-bold">+ Criar Primeiro Setor</button>
+                    </div>`;
+                return;
+            }
+
+            grid.innerHTML = appData.parcels.map(p => {
+                const envBadge = getEnvBadgeHTML(p.environment);
+                const areaDisplay = p.unit === 'ha'
+                    ? `${formatNum(p.area, 2)} ha (${formatNum(p.area * 10000, 0)} m²)`
+                    : `${formatNum(p.area, 0)} m² (${formatNum(p.area / 10000, 3)} ha)`;
+
+                const opsCount = appData.records.filter(r => r.parcelId === p.id).length;
+                const scoutOpen = appData.scouting.filter(s => s.parcelId === p.id && s.status === 'aberto').length;
+
+                return `
+                <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between gap-2 mb-3">
+                            ${envBadge}
+                            <div class="flex items-center gap-1">
+                                <button onclick="openParcelModal('${p.id}')" title="Editar" class="p-1.5 rounded-lg text-slate-400 hover:text-emerald-700 hover:bg-emerald-50">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                </button>
+                                <button onclick="deleteParcel('${p.id}')" title="Eliminar" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <h3 class="font-extrabold text-slate-900 text-lg">${escapeHtml(p.name)}</h3>
+                        <p class="text-sm font-semibold text-emerald-700 mt-0.5">${escapeHtml(p.crop)}</p>
+                        ${p.notes ? `<p class="text-xs text-slate-500 mt-1">${escapeHtml(p.notes)}</p>` : ''}
+                        
+                        <div class="mt-4 space-y-1.5 text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Área:</span>
+                                <span class="font-bold text-slate-800">${areaDisplay}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Operações no Caderno:</span>
+                                <span class="font-bold text-slate-800">${opsCount}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Notas Scouting Abertas:</span>
+                                <span class="font-bold ${scoutOpen > 0 ? 'text-amber-700' : 'text-slate-800'}">${scoutOpen}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-2">
+                        <button onclick="openNewScoutingModal('${p.id}')" class="py-2 px-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-bold transition">
+                            + Foto Scouting
+                        </button>
+                        <button onclick="quickRegisterOp('${p.id}')" class="py-2 px-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold transition">
+                            + Operação
+                        </button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function quickRegisterOp(parcelId) {
+            switchView('new-record');
+            document.getElementById('rec-parcel').value = parcelId;
+        }
+
+        function openParcelModal(editId = null) {
+            const modal = document.getElementById('parcel-modal');
+            document.getElementById('parcel-edit-id').value = editId || '';
+
+            if (editId) {
+                const p = appData.parcels.find(item => item.id === editId);
+                if (!p) return;
+                document.getElementById('parcel-modal-title').textContent = 'Editar Setor / Parcela';
+                document.getElementById('parcel-name-input').value = p.name;
+                document.querySelector(`input[name="parcel-env"][value="${p.environment}"]`).checked = true;
+                document.getElementById('parcel-area-input').value = p.area;
+                document.getElementById('parcel-unit-input').value = p.unit;
+                document.getElementById('parcel-crop-input').value = p.crop;
+                document.getElementById('parcel-notes-input').value = p.notes || '';
+            } else {
+                document.getElementById('parcel-modal-title').textContent = 'Novo Setor / Parcela';
+                document.getElementById('parcel-name-input').value = '';
+                document.querySelector('input[name="parcel-env"][value="estufa"]').checked = true;
+                document.getElementById('parcel-area-input').value = '';
+                document.getElementById('parcel-unit-input').value = 'm2';
+                document.getElementById('parcel-crop-input').value = '';
+                document.getElementById('parcel-notes-input').value = '';
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeParcelModal() {
+            const modal = document.getElementById('parcel-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function handleParcelSubmit(e) {
+            e.preventDefault();
+            const editId = document.getElementById('parcel-edit-id').value;
+            const name = document.getElementById('parcel-name-input').value.trim();
+            const environment = document.querySelector('input[name="parcel-env"]:checked').value;
+            const area = parseFloat(document.getElementById('parcel-area-input').value);
+            const unit = document.getElementById('parcel-unit-input').value;
+            const crop = document.getElementById('parcel-crop-input').value.trim();
+            const notes = document.getElementById('parcel-notes-input').value.trim();
+
+            if (!name || isNaN(area) || !crop) return;
+
+            if (editId) {
+                const idx = appData.parcels.findIndex(p => p.id === editId);
+                if (idx !== -1) appData.parcels[idx] = { id: editId, name, environment, area, unit, crop, notes };
+                showToast('Setor atualizado!');
+            } else {
+                appData.parcels.push({ id: 'p_' + Date.now(), name, environment, area, unit, crop, notes });
+                showToast('Novo setor criado!');
+            }
+
+            saveData();
+            closeParcelModal();
+            refreshAllViews();
+        }
+
+        function deleteParcel(id) {
+            showConfirmModal(
+                'Eliminar Setor?',
+                'Tem a certeza que pretende apagar este setor?',
+                () => {
+                    appData.parcels = appData.parcels.filter(p => p.id !== id);
+                    saveData();
+                    refreshAllViews();
+                    showToast('Setor eliminado.');
+                }
+            );
+        }
+
+        // ==========================================
+        // EXPORTAÇÃO CSV, BACKUP JSON & IMPRESSÃO
+        // ==========================================
+        function exportCSV() {
+            if (appData.records.length === 0 && appData.scouting.length === 0) {
+                showToast('Não existem dados para exportar.');
+                return;
+            }
+
+            let csv = '\uFEFF';
+            csv += 'Registo;Data;Setor;Ambiente;Cultura;Tipo;Produto/Alvo;Detalhes/Metodo;Dose/Qtd;Unidade;Calda(L);IS(dias);GPS_Lat;GPS_Lng;Notas\n';
+
+            // 1. Operações do Caderno
+            appData.records.forEach(r => {
+                const p = appData.parcels.find(item => item.id === r.parcelId);
+                const pName = p ? p.name : 'N/D';
+                const pEnv = p ? p.environment : '';
+                const pCrop = p ? p.crop : '';
+
+                let tipo = '', prod = '', det = '', dose = '', unit = '', vol = '', isD = '';
+                if (r.type === 'tratamento') {
+                    tipo = 'Fitossanitario'; prod = r.product; det = r.target;
+                    dose = String(r.dose).replace('.', ','); unit = r.unit; vol = r.volume || ''; isD = r.isDays || 0;
+                } else if (r.type === 'fertilizacao') {
+                    tipo = 'Fertilizacao'; prod = r.product; det = r.method;
+                    dose = String(r.dose).replace('.', ','); unit = r.unit; vol = r.water || '';
+                } else if (r.type === 'rega') {
+                    tipo = 'Rega'; prod = r.amount; det = `EC:${r.ec || '-'} pH:${r.ph || '-'}`;
+                } else {
+                    tipo = 'Luta Biologica'; prod = r.organism; dose = r.qty;
+                }
+
+                csv += ['Caderno', r.date, pName, pEnv, pCrop, tipo, prod, det, dose, unit, vol, isD, '', '', r.notes || '']
+                    .map(v => `"${String(v).replace(/"/g, '""')}"`).join(';') + '\n';
+            });
+
+            // 2. Notas de Scouting
+            appData.scouting.forEach(s => {
+                const p = appData.parcels.find(item => item.id === s.parcelId);
+                const pName = p ? p.name : 'N/D';
+                const pEnv = p ? p.environment : '';
+                const pCrop = p ? p.crop : '';
+
+                csv += ['Scouting', s.date, pName, pEnv, pCrop, s.category, s.title, `Severidade: ${s.severity} (${s.status})`, '', '', '', '', s.lat || '', s.lng || '', `${s.zoneNote ? s.zoneNote + ' - ' : ''}${s.notes || ''}`]
+                    .map(v => `"${String(v).replace(/"/g, '""')}"`).join(';') + '\n';
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `AgroField_Pro_${getRelativeDate(0)}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            showToast('Ficheiro CSV exportado!');
+        }
+
+        function exportBackupJSON() {
+            const blob = new Blob([JSON.stringify(appData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `AgroField_Backup_${getRelativeDate(0)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            showToast('Backup JSON descarregado!');
+        }
+
+        function importBackupJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (Array.isArray(parsed.parcels) && Array.isArray(parsed.records)) {
+                        if (!parsed.scouting) parsed.scouting = [];
+                        appData = parsed;
+                        saveData();
+                        refreshAllViews();
+                        showToast('Backup restaurado com sucesso!');
+                    } else {
+                        showToast('Formato JSON inválido.');
+                    }
+                } catch (err) {
+                    showToast('Erro ao ler ficheiro JSON.');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        function printCaderno() {
+            switchView('history');
+            document.getElementById('print-date-stamp').textContent = `Emitido em ${formatDatePT(getRelativeDate(0))}`;
+            setTimeout(() => window.print(), 250);
+        }
+
+        // ==========================================
+        // UTILITÁRIOS
+        // ==========================================
+        function showConfirmModal(title, msg, onConfirm) {
+            document.getElementById('confirm-modal-title').textContent = title;
+            document.getElementById('confirm-modal-msg').textContent = msg;
+            confirmCallback = onConfirm;
+            const m = document.getElementById('confirm-modal');
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+        }
+
+        function closeConfirmModal() {
+            const m = document.getElementById('confirm-modal');
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+            confirmCallback = null;
+        }
+
+        document.getElementById('confirm-modal-btn').addEventListener('click', () => {
+            if (confirmCallback) confirmCallback();
+            closeConfirmModal();
+        });
+
+        let toastTimer;
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = msg;
+            t.classList.remove('translate-y-28', 'opacity-0');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => t.classList.add('translate-y-28', 'opacity-0'), 3200);
+        }
+
+        function formatNum(num, decimals = 2) {
+            return Number(num).toLocaleString('pt-PT', {
+                minimumFractionDigits: decimals === 0 ? 0 : 0,
+                maximumFractionDigits: decimals
+            });
+        }
+
+        function formatDatePT(iso) {
+            if (!iso) return '';
+            const p = iso.split('-');
+            return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : iso;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            const d = document.createElement('div');
+            d.textContent = str;
+            return d.innerHTML;
+        }
+    </script>
+</body>
+</html>
